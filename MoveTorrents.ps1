@@ -6,7 +6,8 @@ $sourceDir='D:\Torrents'
 $kidsSDir='E:\Videos\Kids Shows'
 
 #hash table to translate diffs with filenames vs directories using wildcards
-$showName= @{simpsons = 'simpsons';  burgers = 'bobs burgers';sheldon = "Young Sheldon"; family = 'Family Guy'; theory = 'Big Bang Theory'; goldbergs = 'goldbergs'; dad = 'American Dad'}
+$showName= @{'simpsons' = 'simpsons';  'bobs.burgers' = 'bobs burgers';'young.sheldon' = "Young Sheldon"; 'family.guy' = 'Family Guy'; 'big.bang.theory' = 'Big Bang Theory'; 'goldbergs' = 'goldbergs';
+ 'american.dad' = 'American Dad';'NCIS.New' = 'NCIS_NewOrleans'; 'NCIS.Los' = 'NCIS_LA'; 'NCIS.S' = 'NCIS' }
 $seriesList = Get-ChildItem 'E:\videos\Series'
 #create list of torrents that have been downloaded last day and save the name to a var
 $list=Get-ChildItem $sourceDir | Where-Object {$_.LastWriteTime -gt (Get-Date).AddDays(-4)} | Select-Object -ExpandProperty Name
