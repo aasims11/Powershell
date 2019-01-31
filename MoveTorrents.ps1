@@ -10,7 +10,7 @@ $showName= @{'simpsons' = 'simpsons';  'bobs.burgers' = 'bobs burgers';'young.sh
  'american.dad' = 'American Dad';'NCIS.New' = 'NCIS_NewOrleans'; 'NCIS.Los' = 'NCIS_LA'; 'NCIS.S' = 'NCIS' }
 $seriesList = Get-ChildItem 'E:\videos\Series'
 #create list of torrents that have been downloaded last day and save the name to a var
-$list=Get-ChildItem $sourceDir | Where-Object {$_.LastWriteTime -gt (Get-Date).AddDays(-4)} | Select-Object -ExpandProperty Name
+$list=Get-ChildItem $sourceDir | Where-Object {$_.LastWriteTime -gt (Get-Date).AddDays(-7)} | Select-Object -ExpandProperty Name
 #check for dirs
 Write-Output $seriesList | Select-Object -ExpandProperty Name
 #blocks to wrap around script body to output to log
@@ -59,15 +59,31 @@ Write-Output "filelist:`n $files"
 foreach ($f in $files){
  MatchShow($f)
 }
+
+##clean up remaining files in Drop
 $files = Get-ChildItem "E:\Stage\Dropzone" | Select-Object -ExpandProperty Name
 if ($files.Count -gt 1){
   foreach ($f in $files){
+    ##TODO need to wrap movies eval in function
+    if ($f -like '*bdrip*'){
+      Write-Output  "Found a Movie $f"
+      Copy-Item "$stageDir\Dropzone\$f" "E:\videos\movies"
+      Write-Output  "Copy Successful:" 
+      Test-Path "E:\videos\movies\$f"
+      Write-output "Removing $f from Staging Directory"
+      Remove-Item "$stageDir\Dropzone\$f" 
+      Write-output "File Present in DropZone: " 
+      Test-Path "$stageDir\Dropzone\$f"
+    }
+    else{
+      ##TODO wrap final cleanup in function
     Write-Output "No Match - $f moving to Undefined`n"
     Copy-Item "$stageDir\Dropzone\$f" "E:\Stage\Undefined" 
     $r=Test-Path "E:\Stage\Undefined\$f"
      if ( $r -eq 'True'){
       Write-output "Removing $f from Staging Directory"
       Remove-Item "$stageDir\Dropzone\$f" 
+      Write-output "File Present in DropZone:"
       Test-Path "$stageDir\Dropzone\$f"
      }
     else{
@@ -75,8 +91,9 @@ if ($files.Count -gt 1){
       exit(1)
     }
   }
+  }
 }
- #Old Logic using if-else
+ #Old Logic using if-else for matching
  Function SeriesCheck(){
  #Examine file and try to match against current dir
 
